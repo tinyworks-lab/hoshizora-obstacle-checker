@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>星空遮蔽物チェッカー</title>
+  </head>
+  <body>
+    <div id="app">
+      <video id="camera" playsinline muted></video>
+
+      <div id="crosshair" aria-hidden="true">
+        <span class="crosshair-h"></span>
+        <span class="crosshair-v"></span>
+      </div>
+
+      <div id="readout">
+        <div class="readout-row">
+          <span class="readout-label">高度</span>
+          <strong id="altitude" class="readout-value">--</strong>
+        </div>
+        <div class="readout-row">
+          <span class="readout-label">方位</span>
+          <strong id="azimuth" class="readout-value">--</strong>
+        </div>
+      </div>
+
+      <div id="controls">
+        <p id="status">「計測を開始」を押してカメラとセンサーの利用を許可してください。</p>
+        <button id="start" type="button">計測を開始</button>
+      </div>
+
+      <pre id="debug" aria-hidden="true">開発確認用の値はここに表示されます。</pre>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

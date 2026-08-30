@@ -1,0 +1,170 @@
+:root {
+  --bg: #000000;
+  --fg: #ffffff;
+  --fg-dim: rgba(255, 255, 255, 0.65);
+  --panel: rgba(0, 0, 0, 0.55);
+  --crosshair: rgba(255, 255, 255, 0.9);
+
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+}
+
+/* --- カメラライブ表示 --- */
+#camera {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--bg);
+}
+
+/* --- 画面中央の十字マーク --- */
+#crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.crosshair-h,
+.crosshair-v {
+  position: absolute;
+  background: var(--crosshair);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.9);
+}
+
+.crosshair-h {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.crosshair-v {
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+/* --- 高度・方位の表示 --- */
+#readout {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: var(--panel);
+  backdrop-filter: blur(2px);
+  white-space: nowrap;
+}
+
+.readout-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.readout-label {
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+
+.readout-value {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* --- 操作 UI --- */
+#controls {
+  position: absolute;
+  left: 50%;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 190px);
+  transform: translateX(-50%);
+  width: min(92vw, 420px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+#status {
+  margin: 0;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fg);
+  background: var(--panel);
+  border-radius: 8px;
+}
+
+#start {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+}
+
+#start:active {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+#start:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- 開発確認用パネル --- */
+#debug {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--fg-dim);
+  background: var(--panel);
+  white-space: pre;
+  overflow-x: auto;
+}

@@ -34,7 +34,18 @@ export interface OrientationReading {
 
 export type OrientationCallback = (reading: OrientationReading) => void;
 
-export type OrientationPermission = "granted" | "denied" | "unsupported";
+export type OrientationPermissionState =
+  | "granted"
+  | "denied"
+  | "unsupported"
+  | "error";
+
+export interface OrientationPermissionResult {
+  /** requestPermission() の結果を正規化した状態。 */
+  state: OrientationPermissionState;
+  /** デバッグ表示用の詳細文字列。 */
+  detail: string;
+}
 
 /** iOS Safari が付与する独自プロパティ。 */
 interface WebkitDeviceOrientationEvent extends DeviceOrientationEvent {
@@ -95,23 +106,40 @@ function computeAltAz(
 }
 
 /**
- * iOS 13+ では DeviceOrientationEvent.requestPermission() が必要。
- * それ以外の環境では "unsupported" を返す(許可不要とみなす)。
- * 必ずユーザー操作(ボタン押下)から呼び出すこと。
+ * iOS 13+ (Safari) では DeviceOrientationEvent.requestPermission() が必要。
+ * それ以外の環境(Android Chrome / デスクトップ)では "unsupported" を返し、
+ * 呼び出し側は通常の deviceorientation 購読へフォールバックする。
+ *
+ * 【重要】この関数は click ハンドラから、他の非同期処理(カメラ取得など)を
+ * 一切 await する前に呼び出すこと。requestPermission() は WebKit の内部で
+ * transient activation (ユーザー操作直後の状態) を要求するため、先に別の
+ * await を挟むと NotAllowedError で失敗する。
  */
-export async function requestOrientationPermission(): Promise<OrientationPermission> {
+export async function requestOrientationPermission(): Promise<OrientationPermissionResult> {
   const doe =
     DeviceOrientationEvent as unknown as RequestableDeviceOrientationEvent;
 
   if (typeof doe.requestPermission !== "function") {
-    return "unsupported";
+    return {
+      state: "unsupported",
+      detail: "requestPermission() 非対応 → 通常の deviceorientation 購読",
+    };
   }
 
   try {
+    // ここが transient activation を要求する同期呼び出し。
     const result = await doe.requestPermission();
-    return result === "granted" ? "granted" : "denied";
-  } catch {
-    return "denied";
+    return {
+      state: result === "granted" ? "granted" : "denied",
+      detail: `requestPermission() => "${result}"`,
+    };
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "UnknownError";
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      state: "error",
+      detail: `requestPermission() 例外: ${name}: ${message}`,
+    };
   }
 }
 
